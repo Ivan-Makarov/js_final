@@ -65,4 +65,16 @@ class Actor {
             }
         });
     }
+
+    isIntersect(actor) {
+        if (!Actor.prototype.isPrototypeOf(actor) || actor === undefined) {
+            throw new Error('Not an actor')
+        }
+        if (actor === this) {
+            return false
+        }
+        if ((this.right > actor.left && this.left < actor.right) && (this.bottom > actor.top && this.top < actor.bottom)) {
+            return true
+        } else return false
+    }
 }
