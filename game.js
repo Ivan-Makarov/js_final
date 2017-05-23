@@ -78,3 +78,28 @@ class Actor {
         } else return false
     }
 }
+
+class Level {
+    constructor(grid = [], actors) {
+        this.grid = grid;
+        this.actors = actors;
+        this.height = grid.length;
+
+        Object.defineProperty(this, 'width', {
+            get: function () {
+                let longestLine = 0;
+                this.grid.forEach(item => {
+                    if (item.length > longestLine) {
+                        longestLine = item.length;
+                    }
+                });
+                return longestLine
+            }
+        });
+
+        this.status = null;
+        this.finishDelay = 1;
+
+        this.player = new Actor();
+    }
+}
