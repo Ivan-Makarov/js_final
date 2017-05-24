@@ -123,4 +123,23 @@ class Level {
             return false
         };
     }
+
+    actorAt(object) {
+        if (!Actor.prototype.isPrototypeOf(object)) {
+            throw new Error('Not an actor');
+        }
+        let intersectingObject;
+        this.actors.forEach(actor => {
+            if (actor.isIntersect(object) && intersectingObject === undefined) {
+                intersectingObject = actor;
+            }
+        });
+        return intersectingObject;
+    }
+
+    obstacleAt(pos, size) {
+        if (!Vector.prototype.isPrototypeOf(pos) || !Vector.prototype.isPrototypeOf(size)) {
+            throw new Error('Not a vector');
+        }
+    }
 }
