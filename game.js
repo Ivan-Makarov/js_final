@@ -38,7 +38,7 @@ class Actor {
         Object.defineProperty(this, 'type', {
             value: 'actor',
             writable: false,
-            configurable: false
+            configurable: true
         });
 
         Object.defineProperty(this, 'left', {
@@ -79,8 +79,21 @@ class Actor {
     }
 }
 
+class Player extends Actor {
+    constructor(pos = new Vector(0, 0)) {
+        pos.y -= 0.5;
+        super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
+
+        Object.defineProperty(this, 'type', {
+            value: 'player',
+            writable: false,
+            configurable: true
+        });
+    }
+}
+
 class Level {
-    constructor(grid = [], actors) {
+    constructor(grid = [], actors = []) {
         this.grid = grid;
         this.actors = actors;
         this.height = grid.length;
@@ -100,6 +113,14 @@ class Level {
         this.status = null;
         this.finishDelay = 1;
 
-        this.player = new Actor();
+        this.player = new Player();
+    }
+
+    isFinished() {
+        if (this.status !== null && this.finishDelay < 0) {
+            return true
+        } else {
+            return false
+        };
     }
 }
