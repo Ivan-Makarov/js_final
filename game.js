@@ -141,5 +141,32 @@ class Level {
         if (!Vector.prototype.isPrototypeOf(pos) || !Vector.prototype.isPrototypeOf(size)) {
             throw new Error('Not a vector');
         }
+
+        let intersectingObject = new Actor(pos, size);
+
+        if (intersectingObject.left < 0 || intersectingObject.right > this.width || intersectingObject.top < 0) {
+            return 'wall'
+        }
+
+        if (intersectingObject.bottom > this.height) {
+            return 'lava'
+        }
+
+        let top = Math.round(intersectingObject.top);
+        let bottom = Math.round(intersectingObject.bottom);
+        let right = Math.round(intersectingObject.right);
+        let left = Math.round(intersectingObject.left)
+
+        let test = undefined
+
+        for (let i = top; i < bottom; i++) {
+            for (let j = left; j < right; j++) {
+                if (this.grid[i][j] !== undefined) {
+                    test = this.grid[i][j];
+                }
+            }
+        }
+
+        return test
     }
 }
