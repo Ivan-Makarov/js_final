@@ -33,7 +33,7 @@ class Actor {
         this.size = size;
         this.speed = speed;
 
-        this.act = function () {};
+        this.act = () => {};
 
         Object.defineProperty(this, 'type', {
             value: 'actor',
@@ -42,25 +42,25 @@ class Actor {
         });
 
         Object.defineProperty(this, 'left', {
-            get: function () {
+            get: () => {
                 return this.pos.x;
             }
         });
 
         Object.defineProperty(this, 'right', {
-            get: function () {
+            get: () => {
                 return this.pos.x + this.size.x;
             }
         });
 
         Object.defineProperty(this, 'top', {
-            get: function () {
+            get: () => {
                 return this.pos.y;
             }
         });
 
         Object.defineProperty(this, 'bottom', {
-            get: function () {
+            get: () => {
                 return this.pos.y + this.size.y;
             }
         });
@@ -99,7 +99,7 @@ class Level {
         this.height = grid.length;
 
         Object.defineProperty(this, 'width', {
-            get: function () {
+            get: () => {
                 let longestLine = 0;
                 this.grid.forEach(item => {
                     if (item.length > longestLine) {
@@ -113,7 +113,9 @@ class Level {
         this.status = null;
         this.finishDelay = 1;
 
-        this.player = new Player();
+        this.player = this.actors.find(actor => {
+            if (actor.type === 'player') return actor;
+        })
     }
 
     isFinished() {
@@ -161,7 +163,7 @@ class Level {
 
         for (let i = top; i < bottom; i++) {
             for (let j = left; j < right; j++) {
-                if (this.grid[i][j] !== undefined) {
+                if (this.grid[i][j] !== undefined && obstacle === undefined) {
                     obstacle = this.grid[i][j];
                 }
             }
@@ -171,7 +173,7 @@ class Level {
     }
 
     removeActor(actor) {
-        let actorIndex = this.actors.findIndex(function(element) {
+        let actorIndex = this.actors.findIndex(element => {
             if (element === actor) {
                 return element
             }
