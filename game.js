@@ -79,18 +79,18 @@ class Actor {
     }
 }
 
-// class Player extends Actor {
-//     constructor(pos = new Vector(0, 0)) {
-//         pos.y -= 0.5;
-//         super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
-//
-//         Object.defineProperty(this, 'type', {
-//             value: 'player',
-//             writable: false,
-//             configurable: true
-//         });
-//     }
-// }
+class Player extends Actor {
+    constructor(pos = new Vector(0, 0)) {
+        pos.y -= 0.5;
+        super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
+
+        Object.defineProperty(this, 'type', {
+            value: 'player',
+            writable: false,
+            configurable: true
+        });
+    }
+}
 
 class Level {
     constructor(grid = [], actors = []) {
@@ -220,6 +220,35 @@ class Level {
         if (coinsLeft === undefined) {
             this.status = 'won';
             return
+        }
+    }
+}
+
+class LevelParser {
+    constructor(dictionary) {
+        this.dictionary = dictionary;
+    }
+
+    actorFromSymbol(symbol) {
+        if (symbol === undefined) {
+            return undefined
+        }
+        return this.dictionary[symbol]
+    }
+
+    obstacleFromSymbol(symbol) {
+        if (symbol === 'x') {
+            return 'wall'
+        }
+        if (symbol === '!') {
+            return 'lava'
+        }
+        return undefined
+    }
+
+    createGrid(arrayOfStrings) {
+        if (arrayOfStrings.length === 0) {
+            return []
         }
     }
 }
