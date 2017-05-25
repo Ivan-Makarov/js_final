@@ -169,4 +169,13 @@ class Level {
 
         return obstacle
     }
+
+    removeActor(actor) {
+        let actorIndex = this.actors.findIndex(function(element) {
+            if (element === actor) {
+                return element
+            }
+        });
+        this.actors.splice(actorIndex, 1)
+    }
 }
