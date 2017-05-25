@@ -157,16 +157,16 @@ class Level {
         let right = Math.round(intersectingObject.right);
         let left = Math.round(intersectingObject.left)
 
-        let test = undefined
+        let obstacle = undefined
 
         for (let i = top; i < bottom; i++) {
             for (let j = left; j < right; j++) {
                 if (this.grid[i][j] !== undefined) {
-                    test = this.grid[i][j];
+                    obstacle = this.grid[i][j];
                 }
             }
         }
 
-        return test
+        return obstacle
     }
 }
