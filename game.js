@@ -79,18 +79,18 @@ class Actor {
     }
 }
 
-class Player extends Actor {
-    constructor(pos = new Vector(0, 0)) {
-        pos.y -= 0.5;
-        super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
-
-        Object.defineProperty(this, 'type', {
-            value: 'player',
-            writable: false,
-            configurable: true
-        });
-    }
-}
+// class Player extends Actor {
+//     constructor(pos = new Vector(0, 0)) {
+//         pos.y -= 0.5;
+//         super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
+//
+//         Object.defineProperty(this, 'type', {
+//             value: 'player',
+//             writable: false,
+//             configurable: true
+//         });
+//     }
+// }
 
 class Level {
     constructor(grid = [], actors = []) {
@@ -184,16 +184,42 @@ class Level {
     noMoreActors(type) {
         let noMoreActors = true;
 
-        let test = this.actors.find(actor => {
+        let actorsLeft = this.actors.find(actor => {
             if (actor.type === type) {
                 return actor;
             }
         })
 
-        if(test !== undefined) {
+        if(actorsLeft !== undefined) {
             noMoreActors = false;
         }
 
         return noMoreActors
+    }
+
+    playerTouched(obstacleType, actor) {
+        if (this.status !== null) {
+            return
+        }
+
+        if (obstacleType === 'lava' || obstacleType === 'fireball') {
+            this.status = 'lost';
+            return
+        }
+
+        if (obstacleType === 'coin' && actor.type === 'coin') {
+            this.removeActor(actor)
+        }
+
+        let coinsLeft = this.actors.find(actor => {
+            if (actor.type === 'coin') {
+                return actor
+            }
+        });
+
+        if (coinsLeft === undefined) {
+            this.status = 'won';
+            return
+        }
     }
 }
