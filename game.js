@@ -230,43 +230,69 @@ class LevelParser {
     }
 
     actorFromSymbol(symbol) {
-        if (symbol === undefined) {
-            return undefined
-        }
+        if (symbol === undefined) return undefined;
         return this.dictionary[symbol]
     }
 
     obstacleFromSymbol(symbol) {
-        if (symbol === 'x') {
-            return 'wall'
-        }
-        if (symbol === '!') {
-            return 'lava'
-        }
+        if (symbol === 'x') return 'wall';
+        if (symbol === '!') return 'lava';
         return undefined
     }
 
-    createGrid(arrayOfStrings) {
-        if (arrayOfStrings.length === 0) {
-            return []
-        }
+    createGrid(gridSource) {
+        if (gridSource.length === 0) return [];
 
         let grid = [];
 
-        arrayOfStrings.forEach(item => {
-            let gridLineUnprocessed = item.split('');
-            let gridLineProcessed = gridLineUnprocessed.map(item => {
-                if (item === '!') return 'lava';
-                if (item === 'x') return 'wall';
-                return undefined;
-            })
-            grid.push(gridLineProcessed)
+        gridSource.forEach(row => {
+            let gridRowUnprocessed = row.split('');
+            let gridRow = gridRowUnprocessed.map(this.obstacleFromSymbol)
+            grid.push(gridRow)
         })
 
         return grid;
     }
 
-    createActors(arrayOfStrings) {
-        
+    createActors(plan) {
+        if (this.dictionary === undefined) return [];
+        if (plan.length === 0) return [];
+
+        let actors = [];
+
+        let x = 0;
+        let y = 0;
+
+        plan.forEach(row => {
+            console.log(row);
+            for (let symbol of row) {
+                console.log(symbol);
+
+                let constr = this.actorFromSymbol(symbol);
+
+                // При этом, если этот конструктор не является экземпляром Actor, то такой символ игнорируется, и объект не создается. ???????????
+
+                if (constr === Actor) {
+                    let pos = new Vector(x, y);
+                    let test = new constr(pos);
+                    console.log(test);
+                    actors.push(test);
+                }
+                x++;
+                if (x >= row.length) {
+                    x = 0;
+                }
+            }
+            y++;
+        })
+
+
+
+        console.log(actors);
+        return actors;
     }
 }
+
+// let pos = new Vector(1, 1);
+// let test = new Actor(pos);
+// console.log(test);
