@@ -250,5 +250,23 @@ class LevelParser {
         if (arrayOfStrings.length === 0) {
             return []
         }
+
+        let grid = [];
+
+        arrayOfStrings.forEach(item => {
+            let gridLineUnprocessed = item.split('');
+            let gridLineProcessed = gridLineUnprocessed.map(item => {
+                if (item === '!') return 'lava';
+                if (item === 'x') return 'wall';
+                return undefined;
+            })
+            grid.push(gridLineProcessed)
+        })
+
+        return grid;
+    }
+
+    createActors(arrayOfStrings) {
+        
     }
 }
