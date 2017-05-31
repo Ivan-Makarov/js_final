@@ -190,7 +190,7 @@ class Level {
             }
         })
 
-        if(actorsLeft !== undefined) {
+        if (actorsLeft !== undefined) {
             noMoreActors = false;
         }
 
@@ -264,35 +264,26 @@ class LevelParser {
         let y = 0;
 
         plan.forEach(row => {
-            console.log(row);
             for (let symbol of row) {
-                console.log(symbol);
-
                 let constr = this.actorFromSymbol(symbol);
 
                 // При этом, если этот конструктор не является экземпляром Actor, то такой символ игнорируется, и объект не создается. ???????????
+                // В таком случае валится тест
 
-                if (constr === Actor) {
+                if (constr !== undefined) {
                     let pos = new Vector(x, y);
                     let test = new constr(pos);
-                    console.log(test);
                     actors.push(test);
                 }
+
                 x++;
                 if (x >= row.length) {
                     x = 0;
                 }
             }
             y++;
-        })
+        });
 
-
-
-        console.log(actors);
         return actors;
     }
 }
-
-// let pos = new Vector(1, 1);
-// let test = new Actor(pos);
-// console.log(test);
