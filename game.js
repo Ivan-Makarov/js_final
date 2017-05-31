@@ -366,21 +366,45 @@ class Coin extends Actor {
         this.springSpeed = 8;
         this.springDist = 0.07;
 
+        this.initPos = new Vector(this.pos.x, this.pos.y);
+
         function getRandom(min, max) {
             return Math.random() * (max - min) + min;
         }
 
-        let spring = getRandom(0, 2 * Math.PI)
+        let spring = getRandom(0, 2 * Math.PI);
 
         this.spring = spring;
     }
 
-    updateSpring(time) {
-        if (!time) {
-            this.spring += this.springSpeed;
-            return
-        }
+    updateSpring(time = 1) {
         this.spring += (this.springSpeed * time);
+    }
+
+    getSpringVector() {
+        console.log('spring');
+        console.log(this.spring);
+        console.log('dist');
+        console.log(this.springDist);
+        console.log('sin');
+        console.log(Math.sin(this.spring));
+
+        let ySpring = Math.sin(this.spring) * this.springDist;
+
+        let springVector = new Vector(0, ySpring);
+
+        return springVector;
+    }
+
+    getNextPosition(time = 1) {
+        this.updateSpring(time)
+
+        let springVector = this.getSpringVector();
+
+        let nextY = this.initPos.y + springVector.y;
+
+        let nextPosition = new Vector (this.initPos.x, nextY);
+        return nextPosition;
     }
 }
 
