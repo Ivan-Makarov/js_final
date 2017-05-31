@@ -69,7 +69,7 @@ class Actor {
     }
 
     isIntersect(actor) {
-        if (!Actor.prototype.isPrototypeOf(actor) || actor === undefined) {
+        if (!Actor.prototype.isPrototypeOf(actor) || !actor) {
             throw new Error('Not an actor')
         }
         if (actor === this) {
@@ -121,7 +121,7 @@ class Level {
         }
         let intersectingObject;
         this.actors.forEach(actor => {
-            if (actor.isIntersect(object) && intersectingObject === undefined) {
+            if (actor.isIntersect(object) && !intersectingObject) {
                 intersectingObject = actor;
             }
         });
@@ -146,13 +146,13 @@ class Level {
         let top = Math.round(intersectingObject.top);
         let bottom = Math.round(intersectingObject.bottom);
         let right = Math.round(intersectingObject.right);
-        let left = Math.round(intersectingObject.left)
+        let left = Math.round(intersectingObject.left);
 
-        let obstacle = undefined
+        let obstacle = undefined;
 
         for (let x = top; x < bottom; x++) {
             for (let y = left; y < right; y++) {
-                if (this.grid[x][y] !== undefined && obstacle === undefined) {
+                if (this.grid[x][y] && !obstacle) {
                     obstacle = this.grid[x][y];
                 }
             }
@@ -179,7 +179,7 @@ class Level {
             }
         })
 
-        if (actorsLeft !== undefined) {
+        if (actorsLeft) {
             noMoreActors = false;
         }
 
@@ -206,7 +206,7 @@ class Level {
             }
         });
 
-        if (coinsLeft === undefined) {
+        if (!coinsLeft) {
             this.status = 'won';
             return
         }
@@ -219,7 +219,7 @@ class LevelParser {
     }
 
     actorFromSymbol(symbol) {
-        if (symbol === undefined) return undefined;
+        if (!symbol) return undefined;
         return this.dictionary[symbol]
     }
 
@@ -244,7 +244,7 @@ class LevelParser {
     }
 
     createActors(plan) {
-        if (this.dictionary === undefined) return [];
+        if (!this.dictionary) return [];
         if (plan.length === 0) return [];
 
         let actors = [];
@@ -259,7 +259,7 @@ class LevelParser {
                 // При этом, если этот конструктор не является экземпляром Actor, то такой символ игнорируется, и объект не создается. ???????????
                 // В таком случае валится тест
 
-                if (constr !== undefined) {
+                if (constr) {
                     let pos = new Vector(x, y);
                     let test = new constr(pos);
                     actors.push(test);
@@ -296,7 +296,7 @@ class Fireball extends Actor {
     }
 
     getNextPosition(time = 1) {
-        if (time === undefined) {
+        if (!time) {
             return this.pos
         }
         let nextX = this.pos.x + (this.speed.x * time);
@@ -306,10 +306,7 @@ class Fireball extends Actor {
     }
 
     handleObstacle() {
-        this.speed.x *= -1;
-        this.speed.y *= -1;
-
-        // задать вопрос про переопределение const speed в тесте
+        this.speed = this.speed.times(-1)
     }
 
     act(time, level) {
@@ -322,9 +319,80 @@ class Fireball extends Actor {
     }
 }
 
+class HorizontalFireball extends Fireball {
+    constructor(pos) {
+        let speed = new Vector (2, 0);
+        super (pos, speed);
+    }
+}
+
+class VerticalFireball extends Fireball {
+    constructor(pos) {
+        let speed = new Vector (0, 2);
+        super (pos, speed);
+    }
+}
+
+class FireRain extends Fireball {
+    constructor(pos) {
+        let speed = new Vector (0, 3);
+        super (pos, speed);
+        this.initPos = pos;
+    }
+
+    handleObstacle() {
+        this.speed = this.speed;
+        this.pos = this.initPos;
+    }
+}
+
+class Coin extends Actor {
+    constructor(pos = new Vector(0, 0)) {
+
+        let size = new Vector(0.6, 0.6);
+        let shift = new Vector(0.2, 0.1);
+
+        pos.x += shift.x;
+        pos.y += shift.y;
+
+        super (pos, size);
+
+        Object.defineProperty(this, 'type', {
+            value: 'coin',
+            writable: false,
+            configurable: true
+        });
+
+        this.springSpeed = 8;
+        this.springDist = 0.07;
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        let spring = getRandom(0, 2 * Math.PI)
+
+        this.spring = spring;
+    }
+
+    updateSpring(time) {
+        if (!time) {
+            this.spring += this.springSpeed;
+            return
+        }
+        this.spring += (this.springSpeed * time);
+    }
+}
+
 class Player extends Actor {
     constructor(pos = new Vector(0, 0)) {
         pos.y -= 0.5;
         super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
+
+        Object.defineProperty(this, 'type', {
+            value: 'player',
+            writable: false,
+            configurable: true
+        });
     }
 }
