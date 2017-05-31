@@ -161,10 +161,10 @@ class Level {
 
         let obstacle = undefined
 
-        for (let i = top; i < bottom; i++) {
-            for (let j = left; j < right; j++) {
-                if (this.grid[i][j] !== undefined && obstacle === undefined) {
-                    obstacle = this.grid[i][j];
+        for (let x = top; x < bottom; x++) {
+            for (let y = left; y < right; y++) {
+                if (this.grid[x][y] !== undefined && obstacle === undefined) {
+                    obstacle = this.grid[x][y];
                 }
             }
         }
@@ -285,5 +285,13 @@ class LevelParser {
         });
 
         return actors;
+    }
+
+    parse(levelPlan) {
+        console.log(levelPlan);
+        let grid = this.createGrid(levelPlan);
+        let actors = this.createActors(levelPlan)
+        let level = new Level(grid, actors);
+        return level
     }
 }
