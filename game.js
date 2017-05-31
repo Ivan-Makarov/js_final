@@ -33,8 +33,6 @@ class Actor {
         this.size = size;
         this.speed = speed;
 
-        this.act = () => {};
-
         Object.defineProperty(this, 'type', {
             value: 'actor',
             writable: false,
@@ -66,6 +64,10 @@ class Actor {
         });
     }
 
+    act() {
+
+    }
+
     isIntersect(actor) {
         if (!Actor.prototype.isPrototypeOf(actor) || actor === undefined) {
             throw new Error('Not an actor')
@@ -76,19 +78,6 @@ class Actor {
         if ((this.right > actor.left && this.left < actor.right) && (this.bottom > actor.top && this.top < actor.bottom)) {
             return true
         } else return false
-    }
-}
-
-class Player extends Actor {
-    constructor(pos = new Vector(0, 0)) {
-        pos.y -= 0.5;
-        super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
-
-        Object.defineProperty(this, 'type', {
-            value: 'player',
-            writable: false,
-            configurable: true
-        });
     }
 }
 
@@ -288,10 +277,54 @@ class LevelParser {
     }
 
     parse(levelPlan) {
-        console.log(levelPlan);
         let grid = this.createGrid(levelPlan);
         let actors = this.createActors(levelPlan)
         let level = new Level(grid, actors);
         return level
+    }
+}
+
+class Fireball extends Actor {
+    constructor(pos = new Vector(0, 0), speed = new Vector(0, 0)) {
+        super(pos, undefined, speed);
+
+        Object.defineProperty(this, 'type', {
+            value: 'fireball',
+            writable: false,
+            configurable: true
+        });
+    }
+
+    getNextPosition(time = 1) {
+        if (time === undefined) {
+            return this.pos
+        }
+        let nextX = this.pos.x + (this.speed.x * time);
+        let nextY = this.pos.y + (this.speed.y * time);
+        let nextPos = new Vector(nextX, nextY);
+        return nextPos;
+    }
+
+    handleObstacle() {
+        this.speed.x *= -1;
+        this.speed.y *= -1;
+
+        // задать вопрос про переопределение const speed в тесте
+    }
+
+    act(time, level) {
+        let nextPos = this.getNextPosition(time);
+        if (!level.obstacleAt(nextPos, this.size)) {
+            this.pos = nextPos;
+        } else {
+            this.handleObstacle();
+        }
+    }
+}
+
+class Player extends Actor {
+    constructor(pos = new Vector(0, 0)) {
+        pos.y -= 0.5;
+        super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
     }
 }
