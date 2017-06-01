@@ -90,11 +90,14 @@ class Level {
         Object.defineProperty(this, 'width', {
             get: () => {
                 let longestLine = 0;
-                this.grid.forEach(item => {
-                    if (item.length > longestLine) {
-                        longestLine = item.length;
+
+                function findLongestLine(line) {
+                    if (line.length > longestLine) {
+                        longestLine = line.length;
                     }
-                });
+                }
+
+                this.grid.forEach(findLongestLine);
                 return longestLine
             }
         });
@@ -120,11 +123,14 @@ class Level {
             throw new Error('Not an actor');
         }
         let intersectingObject;
-        this.actors.forEach(actor => {
-            if (actor.isIntersect(object) && !intersectingObject) {
+
+        function isIntersectingObject(actor) {
+            if (actor.isIntersect(object)) {
                 intersectingObject = actor;
             }
-        });
+        }
+
+        this.actors.forEach(isIntersectingObject);
         return intersectingObject;
     }
 
@@ -162,22 +168,26 @@ class Level {
     }
 
     removeActor(actor) {
-        let actorIndex = this.actors.findIndex(element => {
+        function isElementToRemove(element) {
             if (element === actor) {
                 return element
             }
-        });
+        }
+
+        let actorIndex = this.actors.findIndex(isElementToRemove);
         this.actors.splice(actorIndex, 1)
     }
 
     noMoreActors(type) {
         let noMoreActors = true;
 
-        let actorsLeft = this.actors.find(actor => {
+        function isType(actor) {
             if (actor.type === type) {
                 return actor;
             }
-        })
+        }
+
+        let actorsLeft = this.actors.find(isType);
 
         if (actorsLeft) {
             noMoreActors = false;
@@ -200,11 +210,13 @@ class Level {
             this.removeActor(actor)
         }
 
-        let coinsLeft = this.actors.find(actor => {
+        function isCoin(actor) {
             if (actor.type === 'coin') {
                 return actor
             }
-        });
+        }
+
+        let coinsLeft = this.actors.find(isCoin);
 
         if (!coinsLeft) {
             this.status = 'won';
@@ -255,9 +267,6 @@ class LevelParser {
         plan.forEach(row => {
             for (let symbol of row) {
                 let constr = this.actorFromSymbol(symbol);
-
-                // При этом, если этот конструктор не является экземпляром Actor, то такой символ игнорируется, и объект не создается. ???????????
-                // В таком случае валится тест
 
                 if (constr) {
                     let pos = new Vector(x, y);
