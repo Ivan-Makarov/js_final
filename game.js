@@ -77,7 +77,9 @@ class Actor {
         }
         if ((this.right > actor.left && this.left < actor.right) && (this.bottom > actor.top && this.top < actor.bottom)) {
             return true
-        } else return false
+        } else {
+            return false
+        }
     }
 }
 
@@ -106,7 +108,7 @@ class Level {
         this.finishDelay = 1;
 
         this.player = this.actors.find(actor => {
-            if (actor.type === 'player') return actor;
+            return actor.type === 'player'
         })
     }
 
@@ -135,10 +137,6 @@ class Level {
     }
 
     obstacleAt(pos, size) {
-        if (!Vector.prototype.isPrototypeOf(pos) || !Vector.prototype.isPrototypeOf(size)) {
-            throw new Error('Not a vector');
-        }
-
         let intersectingObject = new Actor(pos, size);
 
         if (intersectingObject.left < 0 || intersectingObject.right > this.width || intersectingObject.top < 0) {
@@ -149,10 +147,10 @@ class Level {
             return 'lava'
         }
 
-        let top = Math.round(intersectingObject.top);
-        let bottom = Math.round(intersectingObject.bottom);
-        let right = Math.round(intersectingObject.right);
+        let bottom = Math.ceil(intersectingObject.bottom);
+        let top = Math.floor(bottom - intersectingObject.size.y);
         let left = Math.round(intersectingObject.left);
+        let right = Math.round(left + intersectingObject.size.x);
 
         let obstacle = undefined;
 
@@ -206,7 +204,7 @@ class Level {
             return
         }
 
-        if (obstacleType === 'coin' && actor.type === 'coin') {
+        if (obstacleType === 'coin' && actor instanceof Actor) {
             this.removeActor(actor)
         }
 
@@ -231,7 +229,10 @@ class LevelParser {
     }
 
     actorFromSymbol(symbol) {
-        if (!symbol) return undefined;
+        if (!symbol) {
+            return undefined
+        }
+
         return this.dictionary[symbol]
     }
 
@@ -265,17 +266,19 @@ class LevelParser {
         let y = 0;
 
         plan.forEach(row => {
+            let rowLength = row.length;
+
             for (let symbol of row) {
                 let constr = this.actorFromSymbol(symbol);
 
-                if (constr) {
+                if (constr && (constr === Actor || constr.prototype instanceof Actor)) {
                     let pos = new Vector(x, y);
-                    let test = new constr(pos);
-                    actors.push(test);
+                    let object = new constr(pos);
+                    actors.push(object);
                 }
 
                 x++;
-                if (x >= row.length) {
+                if (x >= rowLength) {
                     x = 0;
                 }
             }
@@ -360,11 +363,9 @@ class Coin extends Actor {
 
         let size = new Vector(0.6, 0.6);
         let shift = new Vector(0.2, 0.1);
+        let shiftedPos = pos.plus(shift);
 
-        pos.x += shift.x;
-        pos.y += shift.y;
-
-        super (pos, size);
+        super (shiftedPos, size);
 
         Object.defineProperty(this, 'type', {
             value: 'coin',
@@ -374,8 +375,6 @@ class Coin extends Actor {
 
         this.springSpeed = 8;
         this.springDist = 0.07;
-
-        this.initPos = new Vector(this.pos.x, this.pos.y);
 
         function getRandom(min, max) {
             return Math.random() * (max - min) + min;
@@ -403,9 +402,7 @@ class Coin extends Actor {
 
         let springVector = this.getSpringVector();
 
-        let nextY = this.initPos.y + springVector.y;
-
-        let nextPosition = new Vector (this.initPos.x, nextY);
+        let nextPosition = this.pos.plus(springVector);
         return nextPosition;
     }
 
@@ -417,7 +414,7 @@ class Coin extends Actor {
 
 class Player extends Actor {
     constructor(pos = new Vector(0, 0)) {
-        pos.y -= 0.5;
+        pos.y += -0.5;
         super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
 
         Object.defineProperty(this, 'type', {
@@ -430,11 +427,11 @@ class Player extends Actor {
 
 const schemas = [
   [
-    '         ',
-    '         ',
+    '  z      ',
+    '    f    ',
     '    =    ',
     '       o ',
-    '     !xxx',
+    '    x!xxx',
     ' @       ',
     'xxx!     ',
     '         '
@@ -450,11 +447,12 @@ const schemas = [
     '         '
   ]
 ];
-
 const actorDict = {
   '@': Player,
   'v': FireRain,
-  'o': Coin
+  'o': Coin,
+  'f': HorizontalFireball,
+  'z': VerticalFireball
 }
 const parser = new LevelParser(actorDict);
 runGame(schemas, parser, DOMDisplay)
