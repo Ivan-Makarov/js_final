@@ -107,9 +107,11 @@ class Level {
         this.status = null;
         this.finishDelay = 1;
 
-        this.player = this.actors.find(actor => {
+        function isPlayer(actor) {
             return actor.type === 'player'
-        })
+        }
+
+        this.player = this.actors.find(isPlayer)
     }
 
     isFinished() {
@@ -245,13 +247,15 @@ class LevelParser {
     createGrid(gridSource) {
         if (gridSource.length === 0) return [];
 
-        let grid = [];
+        const thisLevel = this;
 
-        gridSource.forEach(row => {
+        function getGrid(row) {
             let gridRowUnprocessed = row.split('');
-            let gridRow = gridRowUnprocessed.map(this.obstacleFromSymbol)
-            grid.push(gridRow)
-        })
+            let gridRow = gridRowUnprocessed.map(thisLevel.obstacleFromSymbol);
+            return gridRow;
+        }
+
+        let grid = gridSource.map(getGrid)
 
         return grid;
     }
@@ -265,11 +269,13 @@ class LevelParser {
         let x = 0;
         let y = 0;
 
-        plan.forEach(row => {
+        const thisLevel = this;
+
+        function getActors(row) {
             let rowLength = row.length;
 
             for (let symbol of row) {
-                let constr = this.actorFromSymbol(symbol);
+                let constr = thisLevel.actorFromSymbol(symbol);
 
                 if (constr && (constr === Actor || constr.prototype instanceof Actor)) {
                     let pos = new Vector(x, y);
@@ -283,7 +289,9 @@ class LevelParser {
                 }
             }
             y++;
-        });
+        }
+
+        plan.forEach(getActors);
 
         return actors;
     }
@@ -373,6 +381,7 @@ class Coin extends Actor {
             configurable: true
         });
 
+        this.initPos = new Vector(this.pos.x, this.pos.y)
         this.springSpeed = 8;
         this.springDist = 0.07;
 
@@ -400,10 +409,12 @@ class Coin extends Actor {
     getNextPosition(time = 1) {
         this.updateSpring(time)
 
-        let springVector = this.getSpringVector();
+         let springVector = this.getSpringVector();
 
-        let nextPosition = this.pos.plus(springVector);
-        return nextPosition;
+         let nextY = this.initPos.y + springVector.y;
+
+         let nextPosition = new Vector (this.initPos.x, nextY);
+         return nextPosition;
     }
 
     act(time = 1) {
@@ -444,6 +455,16 @@ const schemas = [
     '        x',
     '@   x    ',
     'x        ',
+    '         '
+  ],
+  [
+    '  z f    ',
+    'o       o',
+    'xx    zxx',
+    '    @    ',
+    '   xx    ',
+    'o   f   o',
+    'xx     xx',
     '         '
   ]
 ];
