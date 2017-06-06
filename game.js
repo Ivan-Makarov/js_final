@@ -247,11 +247,11 @@ class LevelParser {
     createGrid(gridSource) {
         if (gridSource.length === 0) return [];
 
-        const thisLevel = this;
+        const thisParser = this;
 
         function getGrid(row) {
             let gridRowUnprocessed = row.split('');
-            let gridRow = gridRowUnprocessed.map(thisLevel.obstacleFromSymbol);
+            let gridRow = gridRowUnprocessed.map(thisParser.obstacleFromSymbol);
             return gridRow;
         }
 
@@ -269,13 +269,13 @@ class LevelParser {
         let x = 0;
         let y = 0;
 
-        const thisLevel = this;
+        const thisParser = this;
 
         function getActors(row) {
             let rowLength = row.length;
 
             for (let symbol of row) {
-                let constr = thisLevel.actorFromSymbol(symbol);
+                let constr = thisParser.actorFromSymbol(symbol);
 
                 if (constr && (constr === Actor || constr.prototype instanceof Actor)) {
                     let pos = new Vector(x, y);
