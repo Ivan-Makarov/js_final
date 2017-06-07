@@ -91,15 +91,16 @@ class Level {
 
         Object.defineProperty(this, 'width', {
             get: () => {
-                let longestLine = 0;
-
-                function findLongestLine(line) {
-                    if (line.length > longestLine) {
-                        longestLine = line.length;
+                function findLongestLine(longest, line) {
+                    const current = line.length;
+                    if (current > longest) {
+                        return current
+                    } else {
+                        return longest
                     }
                 }
 
-                this.grid.forEach(findLongestLine);
+                const longestLine = this.grid.reduce(findLongestLine, 0);
                 return longestLine
             }
         });
