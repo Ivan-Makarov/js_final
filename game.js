@@ -154,8 +154,7 @@ class Level {
             }
         }
 
-        const actorIndex = this.actors.findIndex(isElementToRemove);
-        this.actors.splice(actorIndex, 1)
+        this.actors.splice(this.actors.findIndex(isElementToRemove), 1)
     }
 
     noMoreActors(type) {
@@ -167,9 +166,7 @@ class Level {
             }
         }
 
-        const actorsLeft = this.actors.find(isType);
-
-        if (actorsLeft) {
+        if (this.actors.find(isType)) {
             noMoreActors = false;
         }
 
@@ -196,9 +193,7 @@ class Level {
             }
         }
 
-        const coinsLeft = this.actors.find(isCoin);
-
-        if (!coinsLeft) {
+        if (!this.actors.find(isCoin)) {
             this.status = 'won';
             return
         }
